@@ -1,12 +1,11 @@
-# GVUserDefaults - NSUserDefaults access via properties
+# GVUserDefaults - 通过属性方法访问NSUserDefaults
 
-[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/GVUserDefaults/badge.png)](http://cocoadocs.org/docsets/GVUserDefaults)
-[![Badge w/ Platform](https://cocoapod-badges.herokuapp.com/p/GVUserDefaults/badge.svg)](http://cocoadocs.org/docsets/GVUserDefaults)
 
-Tired of writing all that code to get and set defaults in NSUserDefaults? Want to have code completion and compiler checks by using properties instead?
+平常使用NSUserDefaults，需要使用objectForKey:和setObjectForKey:来对NSUserDefaults中的值进行存取操作。使用GVUserDefaults，你可以通过属性的点方法来往NSUserDefaults中存取值，你只需给GVUserDefaults创建一个类别category，在这个类别里声明你想通过NSUserDefaults存取的属性，并声明这些属性是@dynamic即可。GVUserDefaults会在初始化方法中扫描所有的属性，为它们生成get方法和set方法，并在get方法和set方法中封装对NSUserDefaults的存取操作，这样你就可以通过属性访问NSUserDefaults。
 
-## Usage
-Create a category on `GVUserDefaults`, add some properties in the .h file and make them `@dynamic` in the .m file.
+例如：
+给`GVUserDefaults`类创建一个category，在category的.h文件里声明一些属性，在.m文件里把这些属性声明为@dynamic:
+
 
     // .h
     @interface GVUserDefaults (Properties)
@@ -26,74 +25,15 @@ Create a category on `GVUserDefaults`, add some properties in the .h file and ma
     @dynamic floatValue;
     @end
 
-Now, instead of using `[[NSUserDefaults standardUserDefaults] objectForKey:@"userName"]`, you can simply use `[GVUserDefaults standardUserDefaults].userName`.
+现在，不需要使用`[[NSUserDefaults standardUserDefaults] objectForKey:@"userName"]`, 你可以简单地通过 `[GVUserDefaults standardUserDefaults].userName`.
 
-You can even save defaults by setting the property:
+和
 
     [GVUserDefaults standardUserDefaults].userName = @"myusername";
+来往NSUserDefaults中存取值。
+
+详细的使用方法见[源仓库](https://github.com/gangverk/GVUserDefaults)
+
+`GVUserDefaults`代码只有不到300行，适合刚学习Objective-C runtime的朋友阅读。建议阅读之前先阅读苹果介绍runtime的官方文档[Objective-C Runtime Programming Guide](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Introduction/Introduction.html)，尤其是关于Type Encodings和Declared Properties两节。
 
 
-### Key prefix
-The keys in NSUserDefaults are the same name as your properties. If you'd like to prefix or alter them, add a `transformKey:` method to your category. For example, to turn "userName" into "NSUserDefaultUserName":
-
-    - (NSString *)transformKey:(NSString *)key {
-        key = [key stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[key substringToIndex:1] uppercaseString]];
-        return [NSString stringWithFormat:@"NSUserDefault%@", key];
-    }
-
-### Registering defaults
-Registering defaults can be done as usual, on NSUserDefaults directly (use the same prefix, if any!).
-
-    NSDictionary *defaults = @{
-        @"NSUserDefaultUserName": @"default",
-        @"NSUserDefaultUserId": @1,
-        @"NSUserDefaultBoolValue": @YES
-    };
-
-    [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
-
-However, it's a lot easier to create a setupDefaults method on the category, which takes care of the transformed keys automatically:
-
-    - (NSDictionary *)setupDefaults {
-        return @{
-            @"userName": @"default",
-            @"userId": @1,
-            @"boolValue": @YES
-        };
-    }
-
-### NSUserDefaults initWithSuitName support
-Simply create a methods called `suitName` in your category and return the suitName you wish to use:
-
-    - (NSString *)suitName {
-        return @"com.example.mySuitName";
-    }
-
-
-### Performance
-Performance is nearly identical to using NSUserDefaults directly. We're talking about a difference of 0.05 milliseconds or less.
-
-
-## Install
-Install via [CocoaPods](http://cocoapods.org) (`pod 'GVUserDefaults'`) or drag the code in the GVUserDefaults subfolder to your project.
-
-
-## Issues and questions
-Have a bug? Please [create an issue on GitHub](https://github.com/gangverk/GVUserDefaults/issues)!
-
-
-## Contributing
-GVUserDefaults is an open source project and your contribution is very much appreciated.
-
-1. Check for [open issues](https://github.com/gangverk/GVUserDefaults/issues) or [open a fresh issue](https://github.com/gangverk/GVUserDefaults/issues/new) to start a discussion around a feature idea or a bug.
-2. Fork the [repository on Github](https://github.com/gangverk/GVUserDefaults) and make your changes on the **develop** branch (or branch off of it). Please retain the code style that is used in the project.
-3. Write tests, make sure everything passes.
-4. Send a pull request.
-
-
-## License
-GVUserDefaults is available under the MIT license. See the LICENSE file for more info.
-
-
-## Thanks
-A huge thank you goes to [ADVUserDefaults](https://github.com/advantis/ADVUserDefaults) for its method of creating accessors for primitive types.
