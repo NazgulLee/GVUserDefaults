@@ -28,8 +28,7 @@
 现在，不需要使用`[[NSUserDefaults standardUserDefaults] objectForKey:@"userName"]`, 你可以简单地通过 `[GVUserDefaults standardUserDefaults].userName`.
 
 和
-
-    [GVUserDefaults standardUserDefaults].userName = @"myusername";
+`[GVUserDefaults standardUserDefaults].userName = @"myusername";`
 来往NSUserDefaults中存取值。
 
 详细的使用方法见[源仓库](https://github.com/gangverk/GVUserDefaults)
